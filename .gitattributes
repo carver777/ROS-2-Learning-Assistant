@@ -1,0 +1,58 @@
+# 统一行尾：默认按文本处理，仓库内一律存为 LF
+* text=auto eol=lf
+
+# ===== 显式文本（强制 LF） =====
+*.py    text eol=lf
+*.pyi   text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+*.json  text eol=lf
+*.jsonl text eol=lf
+*.css   text eol=lf
+*.scss  text eol=lf
+*.html  text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.cfg   text eol=lf
+*.ini   text eol=lf
+*.sh    text eol=lf
+
+# ===== Windows 专用脚本：必须 CRLF =====
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# ===== 二进制 =====
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.tar   binary
+*.7z    binary
+*.sqlite binary
+*.sqlite3 binary
+*.db    binary
+*.onnx  binary
+*.pt    binary
+*.pth   binary
+*.bin   binary
+
+# ===== Lock 文件：减少 diff 噪音、避免合并冲突冲击 =====
+package-lock.json     linguist-generated=true -diff merge=ours
+uv.lock               linguist-generated=true -diff merge=ours
+yarn.lock             linguist-generated=true -diff
+pnpm-lock.yaml        linguist-generated=true -diff
+
+# ===== GitHub linguist：忽略目录统计 =====
+database/** linguist-generated=true
