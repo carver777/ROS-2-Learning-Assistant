@@ -51,3 +51,26 @@ class QuizExplainRequest(BaseModel):
     reference_answer: str
     explanation_hint: str | None = None  # 出题时附带的简短解析
     sources: list[dict] | None = None  # 出题时检索到的文档来源
+
+
+# ── Roadmap ──────────────────────────────────────────────────────────────────
+class RoadmapGenerateRequest(BaseModel):
+    """学习路线生成请求。
+
+    - 传 ``preset_id`` 走预制路线（快、固定）
+    - 传 ``goal`` 走 LLM+RAG 自定义生成
+    """
+
+    preset_id: str | None = None
+    goal: str | None = None
+    level: str = "beginner"  # beginner | intermediate | advanced
+    focus: str | None = None  # 重点方向（如 "导航 / 控制 / 仿真"）
+
+
+class RoadmapSectionExplainRequest(BaseModel):
+    """对路线中某一节请求 LLM 流式讲解。"""
+
+    roadmap_title: str
+    section_title: str
+    objectives: list[str]
+    key_concepts: list[str]

@@ -18,7 +18,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import CORS_ORIGINS
-from backend.routers import chat, explain, health, quiz
+from backend.routers import chat, explain, health, quiz, roadmap
 
 
 @asynccontextmanager
@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ROS2 Viz AI Backend", lifespan=lifespan)
+app = FastAPI(title="ROS 2 Learning Assistant Backend", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,5 +35,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for module in (explain, chat, quiz, health):
+for module in (explain, chat, quiz, roadmap, health):
     app.include_router(module.router)

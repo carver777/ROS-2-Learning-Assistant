@@ -11,11 +11,13 @@ import { AnimatedEdge } from './components/AnimatedEdge'
 import { DetailPanel } from './components/DetailPanel'
 import { ChatPanel } from './components/ChatPanel'
 import { QuizPanel } from './components/QuizPanel'
+import { RoadmapPanel } from './components/RoadmapPanel'
 import { scenarios } from './data/scenarios'
 import type { Ros2NodeData, Ros2EdgeData } from './types/ros2'
 import { useAiExplain } from './hooks/useAiExplain'
 import { useChat } from './hooks/useChat'
 import { useQuiz } from './hooks/useQuiz'
+import { useRoadmap } from './hooks/useRoadmap'
 import './App.css'
 
 const nodeTypes = { ros2Node: Ros2Node }
@@ -31,10 +33,17 @@ export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const [selected, setSelected] = useState<SelectedItem>(null)
-  const [mainView, setMainView] = useState<'graph' | 'chat' | 'quiz'>('graph')
+  const [mainView, setMainView] = useState<'graph' | 'chat' | 'quiz' | 'roadmap'>('graph')
+  const [injectedQuizTopic, setInjectedQuizTopic] = useState<string | null>(null)
   const { explanation, sources, usedRag, isLoading, error, explainNode, explainEdge } = useAiExplain()
   const chat = useChat()
   const quiz = useQuiz()
+  const roadmap = useRoadmap()
+
+  const handlePracticeFromRoadmap = useCallback((topic: string) => {
+    setInjectedQuizTopic(topic)
+    setMainView('quiz')
+  }, [])
 
   useEffect(() => {
     setNodes(activeScenario.nodes.map(n => ({ ...n, type: 'ros2Node' })))
@@ -70,9 +79,10 @@ export default function App() {
   }, [selected, explainNode, explainEdge])
 
   const navItems: { id: typeof mainView; label: string; icon: string; busy?: boolean }[] = [
-    { id: 'graph', label: '可视化', icon: '🗺️' },
-    { id: 'chat',  label: 'AI 助手', icon: '💬', busy: chat.isLoading },
-    { id: 'quiz',  label: '知识测验', icon: '📝',
+    { id: 'graph',   label: '经典场景模拟',  icon: '🗺️' },
+    { id: 'roadmap', label: '学习路线', icon: '🧭', busy: roadmap.phase === 'generating' },
+    { id: 'chat',    label: 'AI 助手', icon: '💬', busy: chat.isLoading },
+    { id: 'quiz',    label: '知识测验', icon: '📝',
       busy: quiz.phase === 'generating' || quiz.phase === 'grading' || quiz.phase === 'explaining' },
   ]
 
@@ -93,7 +103,7 @@ export default function App() {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="logo-mark">ROS2</div>
-          <div className="logo-sub">Visual Explorer</div>
+          <div className="logo-sub">Learning Assistant</div>
         </div>
 
         {/* —— 主视图导航 —— */}
@@ -213,7 +223,17 @@ export default function App() {
 
       {mainView === 'quiz' && (
         <main className="full-view">
-          <QuizPanel quiz={quiz} />
+          <QuizPanel
+            quiz={quiz}
+            injectedTopic={injectedQuizTopic}
+            onTopicConsumed={() => setInjectedQuizTopic(null)}
+          />
+        </main>
+      )}
+
+      {mainView === 'roadmap' && (
+        <main className="full-view">
+          <RoadmapPanel roadmap={roadmap} onPracticeSection={handlePracticeFromRoadmap} />
         </main>
       )}
     </div>

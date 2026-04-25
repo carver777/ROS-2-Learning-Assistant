@@ -1,7 +1,7 @@
 [project]
 name = "lab9"
 version = "0.1.0"
-description = "ROS 2 Visual Explorer 后端（FastAPI + DeepSeek 流式代理）"
+description = "ROS 2 Learning Assistant 后端（FastAPI + DeepSeek 流式代理）"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

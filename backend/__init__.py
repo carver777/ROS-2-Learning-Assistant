@@ -1,1 +1,1 @@
-"""ROS 2 Visual Explorer 后端包。"""
+"""ROS 2 Learning Assistant 后端包。"""

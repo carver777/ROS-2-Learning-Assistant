@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { UseQuizReturn, QType, Difficulty, Verdict } from '../hooks/useQuiz'
 import { Markdown } from './Markdown'
 
 interface Props {
   quiz: UseQuizReturn
+  /** 由学习路线等外部入口注入的题目主题；非空时会自动同步到表单并触发出题。 */
+  injectedTopic?: string | null
+  onTopicConsumed?: () => void
 }
 
 const QTYPE_LABEL: Record<QType, string> = {
@@ -25,14 +28,13 @@ const VERDICT_LABEL: Record<Verdict, { text: string; color: string }> = {
 
 const LETTERS = ['A', 'B', 'C', 'D']
 
-export function QuizPanel({ quiz }: Props) {
+export function QuizPanel({ quiz, injectedTopic, onTopicConsumed }: Props) {
   const {
     phase, quiz: q, userAnswer, setUserAnswer,
     grade, explanation, explainSources, error,
     generate, submit, explain, reset,
   } = quiz
 
-  // 出题表单状态
   const [topic, setTopic]           = useState('')
   const [qtype, setQtype]           = useState<QType>('mcq')
   const [difficulty, setDifficulty] = useState<Difficulty>('medium')
@@ -43,6 +45,18 @@ export function QuizPanel({ quiz }: Props) {
 
   const isAnswering = phase === 'answering' || phase === 'grading'
   const isGenerating = phase === 'generating'
+
+  // 来自学习路线等外部入口的注入主题：填入表单后自动出一题
+  const lastInjectedRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!injectedTopic) return
+    if (injectedTopic === lastInjectedRef.current) return
+    if (isGenerating || isAnswering) return
+    lastInjectedRef.current = injectedTopic
+    setTopic(injectedTopic)
+    generate({ topic: injectedTopic, qtype, difficulty })
+    onTopicConsumed?.()
+  }, [injectedTopic, isGenerating, isAnswering, generate, qtype, difficulty, onTopicConsumed])
 
   return (
     <div className="quiz-wrap">
