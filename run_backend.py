@@ -97,18 +97,20 @@ def main():
         clients = []
         print("[RAG] 已跳过", flush=True)
 
-    # 导入 app 并注入模型（必须在模型加载之后才 import backend.main）
-    import backend.main as app_module
+    # 注入 RAG 资源到全局 state，再 import app（确保 app 启动前模型可用）
+    from backend import state
 
-    app_module._bge_model = bge
-    app_module._reranker = rank
-    app_module._qdrant_clients = clients
+    state.bge_model = bge
+    state.reranker = rank
+    state.qdrant_clients = clients
 
     import uvicorn
 
+    from backend.main import app
+
     print(f"[server] 启动 http://{args.host}:{args.port}", flush=True)
     uvicorn.run(
-        app_module.app,
+        app,
         host=args.host,
         port=args.port,
         reload=args.reload,
